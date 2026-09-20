@@ -66,6 +66,21 @@ let partialKeys: { key: string; id: number }[] = [];
     }
   }
 
+  // staple は祖先から継承する。
+  // 「酒」が常備品なら「日本酒」も常備品として扱う。
+  // これが無いと、常備品の子が「主要材料」として数えられ、
+  // さらに所持している親と親子一致して matched に加算されてしまう。
+  for (const ing of byId.values()) {
+    let cur: number | null = ing.parentId;
+    const seen = new Set<number>([ing.id]);
+    while (cur !== null && !seen.has(cur)) {
+      seen.add(cur);
+      const parent = byId.get(cur);
+      if (parent?.staple) { ing.staple = true; break; }
+      cur = parent?.parentId ?? null;
+    }
+  }
+
   partialKeys.sort((a, b) => b.key.length - a.key.length);
 }
 

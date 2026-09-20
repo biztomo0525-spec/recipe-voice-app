@@ -82,7 +82,7 @@ test('[D-03] 親で言われたら子も一致する', () => {
 
 test('[D-03] 子で言われたら親のレシピにも一致する', () => {
   assert.ok(ingredientMatches(id('長ねぎ'), id('ねぎ')), '長ねぎ ⇔ ねぎ');
-  assert.ok(ingredientMatches(id('薄力粉'), id('小麦粉')), '薄力粉 ⇔ 小麦粉');
+  assert.ok(ingredientMatches(id('木綿豆腐'), id('豆腐')), '木綿豆腐 ⇔ 豆腐');
 });
 
 test('[D-03] 兄弟間は一致しない（設計上の最重要ケース）', () => {
@@ -119,6 +119,16 @@ test('[結合] 実データの表記からそのまま正規形に到達する',
 });
 
 // ───────── 辞書の健全性 ─────────
+test('[辞書] stapleは祖先から継承される', () => {
+  // 「酒」が常備品なら「日本酒」も常備品。これが無いと常備品の子が主要材料に数えられる
+  assert.ok(getIngredient(id('日本酒'))!.staple, '日本酒は酒の子なので常備品');
+  assert.ok(getIngredient(id('料理酒'))!.staple);
+  assert.ok(getIngredient(id('米酢'))!.staple, '米酢は酢の子なので常備品');
+  // 強力粉は小麦粉の子にしていないため常備品にならない
+  assert.ok(!getIngredient(id('強力粉'))!.staple, '強力粉は代用できないため独立・非常備');
+  assert.equal(id('薄力粉'), id('小麦粉'), '薄力粉は小麦粉の別名');
+});
+
 test('[辞書] 常備品が UC-03 の想定どおり登録されている', () => {
   for (const n of ['水', '塩', '砂糖', '醤油', '味噌', '酢', '酒', 'みりん', 'サラダ油', '片栗粉']) {
     const ing = getIngredient(id(n))!;

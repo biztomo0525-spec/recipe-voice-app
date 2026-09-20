@@ -50,9 +50,11 @@ export const DICTIONARY: IngredientDef[] = [
   { name: 'ごま油', synonyms: ['ゴマ油', '胡麻油'], staple: true, kind: '調味料' },
   { name: 'オリーブオイル', synonyms: ['オリーブ油', 'エクストラバージンオリーブオイル'], staple: true, kind: '調味料' },
   { name: '片栗粉', synonyms: ['かたくり粉', '水溶き片栗粉'], staple: true, kind: '調味料' },
-  { name: '小麦粉', synonyms: ['メリケン粉'], staple: true, kind: '穀類' },
-  { name: '薄力粉', parent: '小麦粉', kind: '穀類' },
-  { name: '強力粉', parent: '小麦粉', kind: '穀類' },
+  // 日本の家庭で「小麦粉」は通常 薄力粉 を指すため同一視する。
+  // 強力粉は親子にしない：薄力粉では代用できず、「小麦粉がある」で
+  // パンのレシピを「作れる」と判定してしまうため（ごま油を油の子にしないのと同じ理由）
+  { name: '小麦粉', synonyms: ['メリケン粉', '薄力粉', 'はくりき粉'], staple: true, kind: '穀類' },
+  { name: '強力粉', synonyms: ['きょうりき粉'], kind: '穀類' },
   { name: 'だしの素', synonyms: ['ほんだし', '顆粒だし', '和風だしの素', '和風顆粒だし', 'だし', 'だし汁', '出汁', '和風だし'], staple: true, kind: '調味料' },
   { name: 'コンソメ', synonyms: ['コンソメ顆粒', '顆粒コンソメ', 'コンソメキューブ', '固形コンソメ', 'ブイヨン', 'チキンブイヨン'], staple: true, kind: '調味料' },
   { name: '鶏ガラスープの素', synonyms: ['鶏がらスープの素', '鶏ガラスープ', 'がらスープ', '鶏がらスープ', 'ウェイパー', '創味シャンタン'], staple: true, kind: '調味料' },
