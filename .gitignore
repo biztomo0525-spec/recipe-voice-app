@@ -44,3 +44,7 @@ yarn-error.*
 .env
 .env.*
 !.env.example
+
+# ETL の生成物（楽天データ。再配布回避のため管理しない / D-06）
+data/
+assets/recipes.db
