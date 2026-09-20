@@ -39,3 +39,8 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# secrets (楽天アプリIDなど) - 公開リポジトリのため必須
+.env
+.env.*
+!.env.example
