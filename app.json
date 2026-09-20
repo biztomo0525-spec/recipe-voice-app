@@ -1,13 +1,14 @@
 {
   "expo": {
-    "name": "recipe-voice-app",
+    "name": "音声レシピ",
     "slug": "recipe-voice-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundleIdentifier": "com.biztomo0525.recipevoice"
     },
     "android": {
       "adaptiveIcon": {
@@ -20,6 +21,17 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "食材を声で入力するためにマイクを使用します。",
+          "speechRecognitionPermission": "話した食材名を文字に変換するために音声認識を使用します。"
+        }
+      ],
+      "expo-sqlite",
+      "expo-web-browser"
+    ]
   }
 }

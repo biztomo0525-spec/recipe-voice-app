@@ -19,9 +19,10 @@
 | 材料パーサ / 食材辞書 / 正規化 | ✅ 完成 |
 | 検索スコアリング | ✅ 完成 |
 | 音声テキストからの食材抽出 | ✅ 完成 |
-| **UI（V1〜V3）** | ⬜ **未着手** |
+| **UI（V1〜V3）** | ✅ **完成**（シミュレータで通し確認済み） |
 
-検索ロジックは CLI で通し確認できる状態。UI だけが残っている。
+音声入力からレシピ詳細・楽天ページの表示までが動作する。
+音声認識そのものの精度確認だけが実機待ち（P-03）。
 
 ## セットアップ
 
@@ -98,6 +99,30 @@ node scripts/etl/report-coverage.ts --list 50
 
 辞書を育てるときは `--list` の上位から `src/ingredients/dictionary.ts` に追加する（D-10）。
 
+## iOS ビルド（Development Build）
+
+`expo-speech-recognition` はネイティブモジュールのため **Expo Go では動作しない**（P-02）。
+Xcode でローカルビルドを作る。
+
+```bash
+LANG=en_US.UTF-8 npx expo run:ios --device "iPhone 17 Pro"
+```
+
+### つまずきやすい点
+
+| 症状 | 原因と対処 |
+|---|---|
+| `Unicode Normalization not appropriate for ASCII-8BIT` で CocoaPods が失敗 | `LANG` が未設定だと Ruby の外部エンコーディングが `US-ASCII` になり、CocoaPods のパス正規化が落ちる。**`LANG=en_US.UTF-8` を付けて実行する** |
+| シミュレータ連携ツールが「Xcode is installed but not selected」と言う | `/var/db/xcode_select_link` が無い。`xcode-select -p` はリンクが無くてもデフォルトへフォールバックするため一見正常に見える。`sudo xcode-select -s /Applications/Xcode.app/Contents/Developer` を実行する |
+| `assets/recipes.db` が無くてビルドが失敗 | ETL を実行して生成する（git管理外 / D-06） |
+
+### 音声認識の確認は実機で
+
+シミュレータは Mac のマイクを借りるため動作が不安定になりやすい（P-03）。
+UI の確認はシミュレータで、**音声認識の確認は実機で**行う。
+
+無料 Apple ID でも実機ビルドできるが、**署名は7日で失効する**（P-12）。
+
 ## ドキュメント
 
 | 文書 | 内容 |
@@ -112,9 +137,10 @@ node scripts/etl/report-coverage.ts --list 50
 
 ## 次にやること
 
-UI（V1 食材入力 / V2 レシピ一覧 / V3 レシピ詳細）の実装。
+**実機での音声認識の確認**（P-03）。シミュレータでは UI と画面遷移までしか確認できない。
 
-`expo-speech-recognition` はネイティブモジュールのため **Expo Go では動作しない**（P-02）。
-Xcode でローカルの Development Build を作る必要がある。
-Apple Developer Program（年 $99）は不要だが、**無料 Apple ID の署名は7日で失効する**ため
-定期的な再ビルドが必要（P-12）。
+その先の候補（いずれも要件定義のスコープ外。必要になってから判断する）:
+
+- お気に入り登録（FR-12）。NFR-09 を満たすため別DBに置く
+- 辞書の拡充（`report-coverage --list` の上位から）
+- 手順の読み上げ（TTS）。S2 との相性は良いが 2 周目以降と決めている
