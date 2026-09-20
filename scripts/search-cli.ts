@@ -2,25 +2,38 @@
  * 動作確認用 CLI：所持食材からレシピを提案する
  *   UI を作る前に、検索ロジックが実用になるかを実データで確認するためのもの
  *
- * 実行: node scripts/search-cli.ts 玉ねぎ 豚こま 卵
+ * 実行:
+ *   node scripts/search-cli.ts 玉ねぎ 豚こま 卵
+ *   node scripts/search-cli.ts --speech "玉ねぎと豚こまと卵があります"   ← 音声入力の想定
  */
 import { DatabaseSync } from 'node:sqlite';
 import { normalizeIngredient, getIngredient } from '../src/ingredients/normalizer.ts';
+import { parseSpeech } from '../src/ingredients/speechParser.ts';
 import { searchRecipes, type Recipe } from '../src/search/score.ts';
 
-const args = process.argv.slice(2);
+const argv = process.argv.slice(2);
+const speechMode = argv[0] === '--speech';
+const args = speechMode ? argv.slice(1) : argv;
 if (args.length === 0) {
-  console.error('使い方: node scripts/search-cli.ts <食材> [食材...]');
+  console.error('使い方: node scripts/search-cli.ts <食材>...  /  --speech "<発話>"');
   process.exit(1);
 }
 
 // ───────── 入力食材の正規化 ─────────
 const ownedIds: number[] = [];
 const unknown: string[] = [];
-for (const a of args) {
-  const id = normalizeIngredient(a);
-  if (id === null) unknown.push(a);
-  else ownedIds.push(id);
+if (speechMode) {
+  const text = args.join(' ');
+  console.log(`■ 認識した発話\n  「${text}」`);
+  const r = parseSpeech(text);
+  ownedIds.push(...r.ids);
+  unknown.push(...r.unknown);
+} else {
+  for (const a of args) {
+    const id = normalizeIngredient(a);
+    if (id === null) unknown.push(a);
+    else ownedIds.push(id);
+  }
 }
 
 console.log('■ 認識した食材');

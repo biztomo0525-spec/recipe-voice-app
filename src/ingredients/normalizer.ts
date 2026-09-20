@@ -130,6 +130,24 @@ export function normalizeIngredient(candidate: string | null): number | null {
   return null;
 }
 
+/**
+ * 完全一致のみで照合する（照合①②③。部分一致④は行わない）。
+ *
+ * 音声テキストの走査（speechParser）で使う。
+ * 走査では文字列の途中を切り出して試すため、部分一致を許すと
+ * 「ねぎがあ」のような断片が「ねぎ」に当たってしまう。
+ */
+export function lookupExact(surface: string): number | null {
+  const s = surface.normalize('NFKC').trim();
+  if (!s) return null;
+  return bySynonym.get(s) ?? byName.get(s) ?? byKana.get(toKana(s)) ?? null;
+}
+
+/** 辞書に登録されている表記の最大文字数（走査の窓幅） */
+export const MAX_SURFACE_LENGTH = partialKeys.length
+  ? Math.max(...partialKeys.map((p) => p.key.length))
+  : 0;
+
 // ───────── D-03：階層のマッチング ─────────
 
 /** 自分自身を含む祖先の id 列 */
